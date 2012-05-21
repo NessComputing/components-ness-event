@@ -1,0 +1,11 @@
+{
+  "v" : 2,
+  "id" : "5ad87404-9c14-4edd-ae52-7c26eb472f03",
+  "user" : "00000000-0000-04d2-c000-000000026810",
+  "timestamp" : 1299163316279,
+  "type" : "SEARCH",
+  "payload" : {
+    "searchStr" : "mac and cheese",
+    "udid" : "wizbang"
+  }
+}

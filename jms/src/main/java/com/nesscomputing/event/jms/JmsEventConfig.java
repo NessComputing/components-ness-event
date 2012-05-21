@@ -1,0 +1,63 @@
+/**
+ * Copyright (C) 2012 Ness Computing, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.nesscomputing.event.jms;
+
+import org.skife.config.Config;
+import org.skife.config.Default;
+
+public abstract class JmsEventConfig
+{
+    /**
+     * Global enable / disable.
+     */
+    @Config("ness.event.jms.enabled")
+    @Default("false")
+    public boolean isEnabled()
+    {
+        return false;
+    }
+
+    /**
+     * Listen for events on JMS.
+     */
+    @Config("ness.event.jms.listen-enabled")
+    @Default("true")
+    public boolean isListenEnabled()
+    {
+        return true;
+    }
+
+    /**
+     * Send events to JMS.
+     */
+    @Config("ness.event.jms.transmit-enabled")
+    @Default("true")
+    public boolean isTransmitEnabled()
+    {
+        return true;
+    }
+
+    /**
+     * The name of the event JMS topic.
+     */
+    @Config("ness.event.jms.topic-name")
+    @Default("ness.events")
+    public String getTopicName()
+    {
+        return "ness.events";
+    }
+}
+

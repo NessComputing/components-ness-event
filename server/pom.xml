@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.nesscomputing.components</groupId>
+    <artifactId>ness-event</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>ness-event-server</artifactId>
+  <name>ness-event-server</name>
+  <packaging>jar</packaging>
+
+  <properties>
+    <galaxy.packaging>standalone</galaxy.packaging>
+    <galaxy.mainclass>com.nesscomputing.event.server.NessEventServerMain</galaxy.mainclass>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.nesscomputing.components</groupId>
+      <artifactId>ness-httpserver</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.nesscomputing.components</groupId>
+      <artifactId>ness-jersey-server</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.nesscomputing.components</groupId>
+      <artifactId>ness-event-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.nesscomputing.components</groupId>
+      <artifactId>ness-event-jms</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.nesscomputing.components</groupId>
+      <artifactId>ness-config</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.nesscomputing.service.discovery</groupId>
+      <artifactId>discovery-httpserver</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit-dep</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+</project>
