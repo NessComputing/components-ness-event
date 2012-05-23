@@ -13,6 +13,10 @@
   <packaging>jar</packaging>
   <description>JMS specific code for the event system.</description>
 
+  <properties>
+      <ness.root.dir>${project.parent.basedir}</ness.root.dir>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.nesscomputing.components</groupId>
