@@ -28,6 +28,7 @@
   </properties>
 
   <modules>
+    <module>rmq</module>
     <module>core</module>
     <module>jms</module>
     <module>server</module>
@@ -136,6 +137,12 @@
       </dependency>
 
       <dependency>
+        <groupId>com.rabbitmq</groupId>
+        <artifactId>amqp-client</artifactId>
+        <version>2.8.2</version>
+      </dependency>
+
+      <dependency>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-core</artifactId>
         <version>${dep.jersey.version}</version>
@@ -170,6 +177,13 @@
         <artifactId>geronimo-jms_1.1_spec</artifactId>
         <version>1.1.1</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>3.1</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 </project>
