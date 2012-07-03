@@ -15,6 +15,7 @@
   <properties>
     <galaxy.packaging>standalone</galaxy.packaging>
     <galaxy.mainclass>com.nesscomputing.event.server.NessEventServerMain</galaxy.mainclass>
+    <ness.root.dir>${project.parent.basedir}</ness.root.dir>
   </properties>
 
   <dependencies>
