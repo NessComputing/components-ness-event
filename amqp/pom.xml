@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.nesscomputing.components</groupId>
     <artifactId>ness-event</artifactId>
     <version>1.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ness-event-rmq</artifactId>
-  <name>ness-event-rmq</name>
+  <artifactId>ness-event-amqp</artifactId>
+  <name>ness-event-amqp</name>
   <packaging>jar</packaging>
-  <description>AMQ specific code for the event system.</description>
+  <description>AMQP specific code for the event system.</description>
+
+  <properties>
+    <ness.root.dir>${project.parent.basedir}</ness.root.dir>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -37,6 +39,16 @@
     </dependency>
 
     <dependency>
+      <groupId>com.nesscomputing.components</groupId>
+      <artifactId>ness-jackson</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.nesscomputing.components</groupId>
+      <artifactId>ness-amqp</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.skife.config</groupId>
       <artifactId>config-magic</artifactId>
     </dependency>
@@ -45,6 +57,16 @@
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
       <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.rabbitmq</groupId>
+      <artifactId>amqp-client</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
     </dependency>
 
     <dependency>
@@ -58,25 +80,26 @@
     </dependency>
 
     <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.rabbitmq</groupId>
-      <artifactId>amqp-client</artifactId>
+      <groupId>org.apache.qpid</groupId>
+      <artifactId>qpid-broker</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
+      <groupId>org.apache.qpid</groupId>
+      <artifactId>qpid-client</artifactId>
+      <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-    </dependency>
-
   </dependencies>
 </project>
