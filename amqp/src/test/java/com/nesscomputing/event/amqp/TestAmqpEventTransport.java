@@ -130,7 +130,7 @@ public class TestAmqpEventTransport
             sender.enqueue(TEST_EVENT);
         }
 
-        Thread.sleep(1000L);
+        Thread.sleep(2000L);
 
         final NessEvent testEvent = receiver.getEvent();
         Assert.assertNotNull(testEvent);
