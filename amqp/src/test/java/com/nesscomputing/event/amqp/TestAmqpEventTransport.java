@@ -17,11 +17,6 @@ package com.nesscomputing.event.amqp;
 
 import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
@@ -30,6 +25,13 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.Stage;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import com.nesscomputing.amqp.AmqpConfig;
 import com.nesscomputing.config.Config;
 import com.nesscomputing.config.ConfigModule;
@@ -39,20 +41,21 @@ import com.nesscomputing.event.NessEventSender;
 import com.nesscomputing.event.NessEventType;
 import com.nesscomputing.event.amqp.util.CountingEventReceiver;
 import com.nesscomputing.jackson.NessJacksonModule;
-import com.nesscomputing.lifecycle.Lifecycle;
-import com.nesscomputing.lifecycle.LifecycleStage;
-import com.nesscomputing.lifecycle.guice.LifecycleModule;
+import com.nesscomputing.lifecycle.junit.LifecycleRule;
+import com.nesscomputing.lifecycle.junit.LifecycleRunner;
+import com.nesscomputing.lifecycle.junit.LifecycleStatement;
 import com.nesscomputing.testing.lessio.AllowNetworkListen;
 
 @AllowNetworkListen(ports={0})
+@RunWith(LifecycleRunner.class)
 public class TestAmqpEventTransport
 {
+    @LifecycleRule
+    public final LifecycleStatement lifecycleRule = LifecycleStatement.serviceDiscoveryLifecycle();
+
     private static final NessEventType TEST_EVENT_TYPE = NessEventType.getForName("TEST_EVENT");
     private static final UUID USER = UUID.randomUUID();
     private static final NessEvent TEST_EVENT = NessEvent.createEvent(USER, TEST_EVENT_TYPE);
-
-    @Inject
-    private Lifecycle lifecycle = null;
 
     @Inject
     private NessEventSender sender;
@@ -78,7 +81,7 @@ public class TestAmqpEventTransport
         final CountingEventReceiver testEventReceiver = new CountingEventReceiver(TEST_EVENT_TYPE);
         final Injector injector = Guice.createInjector(Stage.PRODUCTION,
                                                        new ConfigModule(config),
-                                                       new LifecycleModule(),
+                                                       lifecycleRule.getLifecycleModule(),
                                                        new NessEventModule(),
                                                        new NessJacksonModule(),
                                                        new AmqpEventModule(config),
@@ -101,18 +104,11 @@ public class TestAmqpEventTransport
 
         Assert.assertNotNull(sender);
         Assert.assertNotNull(receiver);
-
-        Assert.assertNotNull(lifecycle);
-        lifecycle.executeTo(LifecycleStage.START_STAGE);
     }
 
     @After
     public void tearDown() throws Exception
     {
-        Assert.assertNotNull(lifecycle);
-        lifecycle.executeTo(LifecycleStage.STOP_STAGE);
-        lifecycle = null;
-
         qpid.shutdown();
     }
 
@@ -125,12 +121,12 @@ public class TestAmqpEventTransport
         sender.enqueue(TEST_EVENT);
         Thread.sleep(100L);
 
-        for (int i = 1; i < maxCount; i++) {
+        for (int i = 0; i < maxCount; i++) {
             Thread.sleep(4L);
             sender.enqueue(TEST_EVENT);
         }
 
-        Thread.sleep(2000L);
+        Thread.sleep(1000L);
 
         final NessEvent testEvent = receiver.getEvent();
         Assert.assertNotNull(testEvent);

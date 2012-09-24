@@ -65,7 +65,7 @@ public class JmsEventTransmitter implements NessEventTransmitter
      }
 
      @OnStage(LifecycleStage.START)
-     void start()
+     public void start()
      {
          final TopicProducer<Object> topicProducer = topicProducerHolder.get();
          if (topicProducer != null) {
@@ -82,17 +82,21 @@ public class JmsEventTransmitter implements NessEventTransmitter
      }
 
      @OnStage(LifecycleStage.STOP)
-     void stop()
-         throws InterruptedException
+     public void stop()
      {
          final Thread producerThread = producerThreadHolder.getAndSet(null);
          if (producerThread != null) {
-             final TopicProducer<Object> topicProducer = topicProducerHolder.getAndSet(null);
-             if (topicProducer != null) {
-                 topicProducer.shutdown();
+             try {
+                 final TopicProducer<Object> topicProducer = topicProducerHolder.getAndSet(null);
+                 if (topicProducer != null) {
+                     topicProducer.shutdown();
 
-                 producerThread.interrupt();
-                 producerThread.join(500L);
+                     producerThread.interrupt();
+                     producerThread.join(500L);
+                 }
+             }
+             catch (InterruptedException ie) {
+                 Thread.currentThread().interrupt(); // Someone else needs to handle that.
              }
          }
          else {
