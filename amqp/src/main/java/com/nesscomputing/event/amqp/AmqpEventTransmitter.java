@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nesscomputing.event.jms;
+package com.nesscomputing.event.amqp;
 
-import static com.nesscomputing.event.jms.JmsEventModule.JMS_EVENT_NAME;
+import static com.nesscomputing.event.amqp.AmqpEventModule.AMQP_EVENT_NAME;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,58 +26,55 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-
+import com.nesscomputing.amqp.AmqpRunnableFactory;
+import com.nesscomputing.amqp.ExchangePublisher;
 import com.nesscomputing.event.NessEvent;
 import com.nesscomputing.event.NessEventTransmitter;
-import com.nesscomputing.jms.JmsRunnableFactory;
-import com.nesscomputing.jms.TopicProducer;
 import com.nesscomputing.lifecycle.LifecycleStage;
 import com.nesscomputing.lifecycle.guice.OnStage;
 import com.nesscomputing.logging.Log;
 
 /**
- * Transmits an event onto a JMS topic.
+ * Transmits an event onto an AMQP exchange.
  */
 @Singleton
-public class JmsEventTransmitter implements NessEventTransmitter
+public class AmqpEventTransmitter implements NessEventTransmitter
  {
      private static final Log LOG = Log.findLog();
 
-     private final JmsEventConfig jmsEventConfig;
+     private final AmqpEventConfig amqpEventConfig;
 
-     private final AtomicReference<TopicProducer<Object>> topicProducerHolder = new AtomicReference<TopicProducer<Object>>();
+     private final AtomicReference<ExchangePublisher<NessEvent>> exchangePublisherHolder = new AtomicReference<ExchangePublisher<NessEvent>>();
      private final AtomicReference<Thread> producerThreadHolder = new AtomicReference<Thread>();
 
      private AtomicInteger eventsTransmitted = new AtomicInteger(0);
 
      @Inject
-     public JmsEventTransmitter(final JmsEventConfig jmsEventConfig)
+     AmqpEventTransmitter(final AmqpEventConfig amqpEventConfig)
      {
-         Preconditions.checkNotNull(jmsEventConfig, "The config must not be null!");
-         this.jmsEventConfig = jmsEventConfig;
+         this.amqpEventConfig = amqpEventConfig;
      }
 
      @Inject(optional = true)
-     public void injectTopicFactory(@Named(JMS_EVENT_NAME) final JmsRunnableFactory topicFactory)
+     void injectExchangeFactory(@Named(AMQP_EVENT_NAME) final AmqpRunnableFactory exchangeFactory)
      {
-         Preconditions.checkNotNull(topicFactory, "The topic factory must not be null!");
-         this.topicProducerHolder.set(topicFactory.createTopicJsonProducer(jmsEventConfig.getTopicName()));
+         this.exchangePublisherHolder.set(exchangeFactory.<NessEvent>createExchangeJsonPublisher(amqpEventConfig.getExchangeName()));
      }
 
      @OnStage(LifecycleStage.START)
      void start()
      {
-         final TopicProducer<Object> topicProducer = topicProducerHolder.get();
-         if (topicProducer != null) {
+         final ExchangePublisher<NessEvent> exchangePublisher = exchangePublisherHolder.get();
+         if (exchangePublisher != null) {
              Preconditions.checkState(producerThreadHolder.get() == null, "already started, boldly refusing to start twice!");
-             final Thread producerThread = new Thread(topicProducer, "ness-event-jms-producer");
+             final Thread producerThread = new Thread(exchangePublisher, "ness-event-amqp-producer");
              Preconditions.checkState(producerThreadHolder.getAndSet(producerThread) == null, "thread already set, this should not happen!");
 
              producerThread.setDaemon(true);
              producerThread.start();
          }
          else {
-             LOG.debug("JMS seems to be disabled, skipping Event transmitter start!");
+             LOG.debug("AMQP seems to be disabled, skipping Event transmitter start!");
          }
      }
 
@@ -87,9 +84,9 @@ public class JmsEventTransmitter implements NessEventTransmitter
      {
          final Thread producerThread = producerThreadHolder.getAndSet(null);
          if (producerThread != null) {
-             final TopicProducer<Object> topicProducer = topicProducerHolder.getAndSet(null);
-             if (topicProducer != null) {
-                 topicProducer.shutdown();
+             final ExchangePublisher<NessEvent> exchangePublisher = exchangePublisherHolder.getAndSet(null);
+             if (exchangePublisher != null) {
+                 exchangePublisher.shutdown();
 
                  producerThread.interrupt();
                  producerThread.join(500L);
@@ -102,8 +99,8 @@ public class JmsEventTransmitter implements NessEventTransmitter
 
      public boolean isConnected()
      {
-         final TopicProducer<Object> topicProducer = topicProducerHolder.get();
-         return (topicProducer != null && topicProducer.isConnected());
+         final ExchangePublisher<NessEvent> exchangePublisher = exchangePublisherHolder.get();
+         return (exchangePublisher != null && exchangePublisher.isConnected());
      }
 
      public int getEventsTransmittedCount()
@@ -116,12 +113,12 @@ public class JmsEventTransmitter implements NessEventTransmitter
      {
          Preconditions.checkArgument(event != null, "An event can not be null!");
 
-         final TopicProducer<Object> topicProducer = topicProducerHolder.get();
-         if (topicProducer == null) {
+         final ExchangePublisher<NessEvent> exchangePublisher = exchangePublisherHolder.get();
+         if (exchangePublisher == null) {
              return;
          }
-         if (!topicProducer.offerWithTimeout(event)) {
-             LOG.warn("Could not offer message '%s' to topic, maybe stuck?", event);
+         if (!exchangePublisher.offerWithTimeout(event)) {
+             LOG.warn("Could not offer message '%s' to exchange, maybe stuck?", event);
          }
          else {
              eventsTransmitted.incrementAndGet();

@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nesscomputing.event.jms;
+package com.nesscomputing.event.amqp;
 
 import org.skife.config.Config;
 import org.skife.config.Default;
 
-public abstract class JmsEventConfig
+public abstract class AmqpEventConfig
 {
     /**
      * Global enable / disable.
      */
-    @Config("ness.event.${jmsName}.enabled")
+    @Config("ness.event.amqp.enabled")
     @Default("false")
     public boolean isEnabled()
     {
@@ -31,9 +31,9 @@ public abstract class JmsEventConfig
     }
 
     /**
-     * Listen for events on JMS.
+     * Listen for events on AMQP.
      */
-    @Config("ness.event.${jmsName}.listen-enabled")
+    @Config("ness.event.amqp.listen-enabled")
     @Default("true")
     public boolean isListenEnabled()
     {
@@ -41,9 +41,9 @@ public abstract class JmsEventConfig
     }
 
     /**
-     * Send events to JMS.
+     * Send events to AMQP.
      */
-    @Config("ness.event.${jmsName}.transmit-enabled")
+    @Config("ness.event.amqp.transmit-enabled")
     @Default("true")
     public boolean isTransmitEnabled()
     {
@@ -51,11 +51,11 @@ public abstract class JmsEventConfig
     }
 
     /**
-     * The name of the event JMS topic.
+     * The name of the event AMQP exchange.
      */
-    @Config("ness.event.${jmsName}.topic-name")
+    @Config("ness.event.amqp.exchange-name")
     @Default("ness.events")
-    public String getTopicName()
+    public String getExchangeName()
     {
         return "ness.events";
     }

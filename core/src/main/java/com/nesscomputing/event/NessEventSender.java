@@ -17,17 +17,18 @@ package com.nesscomputing.event;
 
 import static com.nesscomputing.event.NessEventModule.EVENT_NAME;
 
-import com.nesscomputing.logging.Log;
-
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+
+import com.nesscomputing.logging.Log;
 
 @Singleton
 public class NessEventSender
@@ -39,25 +40,38 @@ public class NessEventSender
     private final Set<NessEventTransmitter> eventTransmitters = Sets.newHashSet();
 
     @Inject
-    NessEventSender(final NessEventConfig eventConfig)
+    public NessEventSender(@Nullable final NessEventConfig eventConfig)
     {
         this.eventConfig = eventConfig;
     }
 
     @Inject(optional=true)
-    void injectTransmitters(@Named(EVENT_NAME) final Map<String, NessEventTransmitter> eventTransmitters)
+    void injectTransmitters(@Named(EVENT_NAME) final Map<String, NessEventTransmitter> availableTransmitters)
     {
-        final String [] transports = eventConfig.getTransports();
+        if (eventConfig != null) {
+            final String [] transports = eventConfig.getTransports();
 
-        for (int i = 0; i < transports.length; i++) {
-            if (eventTransmitters.containsKey(transports[i])) {
-                this.eventTransmitters.add(eventTransmitters.get(transports[i]));
-                LOG.trace("Added %s as an event transport.", transports[i]);
-            }
-            else {
-                LOG.warn("Event transport %s configured but not available.", transports[i]);
+            for (int i = 0; i < transports.length; i++) {
+                if (availableTransmitters.containsKey(transports[i])) {
+                    addEventTransmitter(availableTransmitters.get(transports[i]));
+                    LOG.trace("Added %s as an event transport.", transports[i]);
+                }
+                else {
+                    LOG.warn("Event transport %s configured but not available.", transports[i]);
+                }
             }
         }
+        else {
+            LOG.warn("Event config is null but transports were injected!");
+        }
+    }
+
+    /**
+     * Add a new transmitter to this sender.
+     */
+    public void addEventTransmitter(final NessEventTransmitter eventTransmitter)
+    {
+        this.eventTransmitters.add(eventTransmitter);
     }
 
     /**

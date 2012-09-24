@@ -13,28 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nesscomputing.event.jms;
+package com.nesscomputing.event.amqp;
 
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
-
+import com.nesscomputing.amqp.AmqpModule;
 import com.nesscomputing.config.Config;
 import com.nesscomputing.event.NessEventModule;
-import com.nesscomputing.jms.JmsModule;
 
-public class JmsEventModule extends AbstractModule
+public class AmqpEventModule extends AbstractModule
 {
-    public static final String JMS_EVENT_NAME = "jms-event";
+    public static final String AMQP_EVENT_NAME = "amqp-event";
 
-    public static final Named JMS_EVENT_NAMED = Names.named(JMS_EVENT_NAME);
+    public static final Named AMQP_EVENT_NAMED = Names.named(AMQP_EVENT_NAME);
 
     private final Config config;
 
-    public JmsEventModule(final Config config)
+    public AmqpEventModule(final Config config)
     {
         this.config = config;
     }
@@ -42,18 +40,18 @@ public class JmsEventModule extends AbstractModule
     @Override
     public void configure()
     {
-        final JmsEventConfig jmsEventConfig = config.getBean(JmsEventConfig.class, ImmutableMap.of("jmsName", "jms"));
-        bind(JmsEventConfig.class).toInstance(jmsEventConfig);
+        final AmqpEventConfig amqpEventConfig = config.getBean(AmqpEventConfig.class);
+        bind(AmqpEventConfig.class).toInstance(amqpEventConfig);
 
-        if (jmsEventConfig.isEnabled()) {
-            install (new JmsModule(config, JMS_EVENT_NAME));
+        if (amqpEventConfig.isEnabled()) {
+            install (new AmqpModule(config, AMQP_EVENT_NAME));
 
-            if (jmsEventConfig.isListenEnabled()) {
-                bind(JmsEventReceiver.class).asEagerSingleton();
+            if (amqpEventConfig.isListenEnabled()) {
+                bind(AmqpEventReceiver.class).asEagerSingleton();
             }
-            if (jmsEventConfig.isTransmitEnabled()) {
-                bind(JmsEventTransmitter.class).in(Scopes.SINGLETON);
-                NessEventModule.bindEventTransmitter(binder(), "jms").to(JmsEventTransmitter.class).in(Scopes.SINGLETON);
+            if (amqpEventConfig.isTransmitEnabled()) {
+                bind(AmqpEventTransmitter.class).in(Scopes.SINGLETON);
+                NessEventModule.bindEventTransmitter(binder(), "amqp").to(AmqpEventTransmitter.class).in(Scopes.SINGLETON);
             }
         }
     }
