@@ -57,7 +57,7 @@ public class JmsEventReceiver implements ConsumerCallback<String>
     private final AtomicInteger eventsReceived = new AtomicInteger(0);
 
     @Inject
-    JmsEventReceiver(final JmsEventConfig jmsEventConfig,
+    public JmsEventReceiver(final JmsEventConfig jmsEventConfig,
                      final NessEventDispatcher eventDispatcher,
                      final ObjectMapper mapper)
     {
@@ -67,13 +67,13 @@ public class JmsEventReceiver implements ConsumerCallback<String>
     }
 
     @Inject(optional = true)
-    void injectTopicFactory(@Named(JMS_EVENT_NAME) final JmsRunnableFactory topicFactory)
+    public void injectTopicFactory(@Named(JMS_EVENT_NAME) final JmsRunnableFactory topicFactory)
     {
         this.topicConsumerHolder.set(topicFactory.createTopicTextMessageListener(jmsEventConfig.getTopicName(), this));
     }
 
     @OnStage(LifecycleStage.START)
-    void start()
+    public void start()
     {
         final TopicConsumer topicConsumer = topicConsumerHolder.get();
         if (topicConsumer != null) {
@@ -90,17 +90,21 @@ public class JmsEventReceiver implements ConsumerCallback<String>
     }
 
     @OnStage(LifecycleStage.STOP)
-    void stop()
-        throws InterruptedException
+    public void stop()
     {
         final Thread consumerThread = consumerThreadHolder.getAndSet(null);
         if (consumerThread != null) {
-            final TopicConsumer topicConsumer = topicConsumerHolder.getAndSet(null);
-            if (topicConsumer != null) {
-                topicConsumer.shutdown();
+            try {
+                final TopicConsumer topicConsumer = topicConsumerHolder.getAndSet(null);
+                if (topicConsumer != null) {
+                    topicConsumer.shutdown();
 
-                consumerThread.interrupt();
-                consumerThread.join(500L);
+                    consumerThread.interrupt();
+                    consumerThread.join(500L);
+                }
+            }
+            catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();  // Someone else needs to handle that.
             }
         }
         else {
