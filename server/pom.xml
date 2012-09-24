@@ -21,12 +21,12 @@
   <dependencies>
     <dependency>
       <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-httpserver</artifactId>
+      <artifactId>ness-server</artifactId>
     </dependency>
 
     <dependency>
       <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-jersey-server</artifactId>
+      <artifactId>ness-server-templates</artifactId>
     </dependency>
 
     <dependency>

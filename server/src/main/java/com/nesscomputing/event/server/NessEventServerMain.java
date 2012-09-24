@@ -18,11 +18,12 @@ package com.nesscomputing.event.server;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+
 import com.nesscomputing.config.Config;
 import com.nesscomputing.event.NessEventModule;
 import com.nesscomputing.event.jms.JmsEventModule;
-import com.nesscomputing.httpserver.standalone.StandaloneServer;
-import com.nesscomputing.jersey.BasicJerseyServerModule;
+import com.nesscomputing.server.StandaloneServer;
+import com.nesscomputing.server.templates.BasicDiscoveryServerModule;
 import com.nesscomputing.service.discovery.httpserver.DiscoveryStandaloneServer;
 
 public class NessEventServerMain extends DiscoveryStandaloneServer
@@ -40,13 +41,19 @@ public class NessEventServerMain extends DiscoveryStandaloneServer
     }
 
     @Override
+    protected String getServerType()
+    {
+        return "event";
+    }
+
+    @Override
     public Module getMainModule(final Config config)
     {
         return new AbstractModule() {
             @Override
             public void configure()
             {
-                install(new BasicJerseyServerModule(config));
+                install(new BasicDiscoveryServerModule(config));
 
                 install(new NessEventModule());
                 install(new JmsEventModule(config));
