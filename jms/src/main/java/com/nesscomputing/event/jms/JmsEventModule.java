@@ -16,10 +16,12 @@
 package com.nesscomputing.event.jms;
 
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
+
 import com.nesscomputing.config.Config;
 import com.nesscomputing.event.NessEventModule;
 import com.nesscomputing.jms.JmsModule;
@@ -40,7 +42,7 @@ public class JmsEventModule extends AbstractModule
     @Override
     public void configure()
     {
-        final JmsEventConfig jmsEventConfig = config.getBean(JmsEventConfig.class);
+        final JmsEventConfig jmsEventConfig = config.getBean(JmsEventConfig.class, ImmutableMap.of("jmsName", "jms"));
         bind(JmsEventConfig.class).toInstance(jmsEventConfig);
 
         if (jmsEventConfig.isEnabled()) {

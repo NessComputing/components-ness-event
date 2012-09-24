@@ -23,7 +23,7 @@ public abstract class JmsEventConfig
     /**
      * Global enable / disable.
      */
-    @Config("ness.event.jms.enabled")
+    @Config("ness.event.${jmsName}.enabled")
     @Default("false")
     public boolean isEnabled()
     {
@@ -33,7 +33,7 @@ public abstract class JmsEventConfig
     /**
      * Listen for events on JMS.
      */
-    @Config("ness.event.jms.listen-enabled")
+    @Config("ness.event.${jmsName}.listen-enabled")
     @Default("true")
     public boolean isListenEnabled()
     {
@@ -43,7 +43,7 @@ public abstract class JmsEventConfig
     /**
      * Send events to JMS.
      */
-    @Config("ness.event.jms.transmit-enabled")
+    @Config("ness.event.${jmsName}.transmit-enabled")
     @Default("true")
     public boolean isTransmitEnabled()
     {
@@ -53,7 +53,7 @@ public abstract class JmsEventConfig
     /**
      * The name of the event JMS topic.
      */
-    @Config("ness.event.jms.topic-name")
+    @Config("ness.event.${jmsName}.topic-name")
     @Default("ness.events")
     public String getTopicName()
     {
