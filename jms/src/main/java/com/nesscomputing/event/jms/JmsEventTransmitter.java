@@ -22,11 +22,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nonnull;
 
-
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+
 import com.nesscomputing.event.NessEvent;
 import com.nesscomputing.event.NessEventTransmitter;
 import com.nesscomputing.jms.JmsRunnableFactory;
@@ -51,14 +51,16 @@ public class JmsEventTransmitter implements NessEventTransmitter
      private AtomicInteger eventsTransmitted = new AtomicInteger(0);
 
      @Inject
-     JmsEventTransmitter(final JmsEventConfig jmsEventConfig)
+     public JmsEventTransmitter(final JmsEventConfig jmsEventConfig)
      {
+         Preconditions.checkNotNull(jmsEventConfig, "The config must not be null!");
          this.jmsEventConfig = jmsEventConfig;
      }
 
      @Inject(optional = true)
-     void injectTopicFactory(@Named(JMS_EVENT_NAME) final JmsRunnableFactory topicFactory)
+     public void injectTopicFactory(@Named(JMS_EVENT_NAME) final JmsRunnableFactory topicFactory)
      {
+         Preconditions.checkNotNull(topicFactory, "The topic factory must not be null!");
          this.topicProducerHolder.set(topicFactory.createTopicJsonProducer(jmsEventConfig.getTopicName()));
      }
 
