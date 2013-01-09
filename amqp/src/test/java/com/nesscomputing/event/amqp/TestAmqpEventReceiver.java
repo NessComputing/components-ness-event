@@ -17,22 +17,23 @@ package com.nesscomputing.event.amqp;
 
 import javax.annotation.Nonnull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.rabbitmq.client.AMQP.BasicProperties;
+import com.rabbitmq.client.Envelope;
+import com.rabbitmq.client.QueueingConsumer.Delivery;
+
 import org.apache.commons.io.Charsets;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.nesscomputing.config.Config;
 import com.nesscomputing.config.ConfigModule;
 import com.nesscomputing.event.NessEvent;
 import com.nesscomputing.event.NessEventDispatcher;
 import com.nesscomputing.jackson.NessJacksonModule;
 import com.nesscomputing.logging.Log;
-import com.rabbitmq.client.AMQP.BasicProperties;
-import com.rabbitmq.client.Envelope;
-import com.rabbitmq.client.QueueingConsumer.Delivery;
 
 /**
  *

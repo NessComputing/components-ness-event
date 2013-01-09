@@ -17,18 +17,17 @@ package com.nesscomputing.event.jms;
 
 import javax.annotation.Nonnull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.nesscomputing.config.Config;
 import com.nesscomputing.config.ConfigModule;
 import com.nesscomputing.event.NessEvent;
 import com.nesscomputing.event.NessEventDispatcher;
-import com.nesscomputing.event.jms.JmsEventReceiver;
 import com.nesscomputing.jackson.NessJacksonModule;
 import com.nesscomputing.logging.Log;
 

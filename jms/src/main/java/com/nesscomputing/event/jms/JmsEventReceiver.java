@@ -22,14 +22,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.jms.JMSException;
 
-
-import org.codehaus.jackson.map.ObjectMapper;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+
 import com.nesscomputing.event.NessEvent;
 import com.nesscomputing.event.NessEventDispatcher;
 import com.nesscomputing.jms.ConsumerCallback;

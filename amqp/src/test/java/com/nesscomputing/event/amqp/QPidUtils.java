@@ -41,9 +41,12 @@ public class QPidUtils
         final File configFile = new File(configUrl.toURI());
         BrokerOptions options = new BrokerOptions();
         options.setConfigFile(configFile.getAbsolutePath());
-        final URL log4jUrl = Resources.getResource(QPidUtils.class, "/log4j.xml");
-        final File log4jFile = new File(log4jUrl.toURI());
-        options.setLogConfigFile(log4jFile.getAbsolutePath());
+
+        // XXX: this requires a log4j file to not be in a JAR, which sucks.
+
+//        final URL log4jUrl = Resources.getResource(QPidUtils.class, "/log4j.xml");
+//        final File log4jFile = new File(log4jUrl.toURI());
+//        options.setLogConfigFile(log4jFile.getAbsolutePath());
 
         port = findUnusedPort();
         options.addPort(port);

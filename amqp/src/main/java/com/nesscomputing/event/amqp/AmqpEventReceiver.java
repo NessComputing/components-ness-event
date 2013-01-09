@@ -15,29 +15,27 @@
  */
 package com.nesscomputing.event.amqp;
 
-import static com.nesscomputing.event.amqp.AmqpEventModule.AMQP_EVENT_NAME;
-
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import com.rabbitmq.client.QueueingConsumer.Delivery;
+
 import com.nesscomputing.amqp.AmqpRunnableFactory;
 import com.nesscomputing.amqp.ConsumerCallback;
 import com.nesscomputing.amqp.ExchangeConsumer;
 import com.nesscomputing.event.NessEvent;
 import com.nesscomputing.event.NessEventDispatcher;
-import com.nesscomputing.jackson.Json;
+import com.nesscomputing.jackson.JsonMapper;
 import com.nesscomputing.lifecycle.LifecycleStage;
 import com.nesscomputing.lifecycle.guice.OnStage;
 import com.nesscomputing.logging.Log;
-import com.rabbitmq.client.QueueingConsumer.Delivery;
 
 /**
  * Received an Event from the JMS message queue and dispatches it to the event system.
@@ -59,7 +57,7 @@ public class AmqpEventReceiver implements ConsumerCallback
     @Inject
     AmqpEventReceiver(final AmqpEventConfig amqpEventConfig,
                      final NessEventDispatcher eventDispatcher,
-                     @Json final ObjectMapper mapper)
+                     @JsonMapper final ObjectMapper mapper)
     {
         this.eventDispatcher = eventDispatcher;
         this.mapper = mapper;
@@ -67,7 +65,7 @@ public class AmqpEventReceiver implements ConsumerCallback
     }
 
     @Inject(optional = true)
-    void injectExchangeFactory(@Named(AMQP_EVENT_NAME) final AmqpRunnableFactory exchangeFactory)
+    void injectExchangeFactory(@Named(AmqpEventModule.AMQP_EVENT_NAME) final AmqpRunnableFactory exchangeFactory)
     {
         this.exchangeConsumerHolder.set(exchangeFactory.createExchangeListener(amqpEventConfig.getExchangeName(), this));
     }

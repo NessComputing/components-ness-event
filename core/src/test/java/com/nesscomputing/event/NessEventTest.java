@@ -19,22 +19,22 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.nesscomputing.event.NessEvent;
-import com.nesscomputing.event.NessEventType;
-import com.nesscomputing.event.NessEventTypes;
 
 public class NessEventTest
 {
@@ -49,7 +49,8 @@ public class NessEventTest
 	public void setUp()
 	{
         mapper = new ObjectMapper();
-        mapper.setDeserializationConfig(mapper.getDeserializationConfig().without(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES));
+        mapper.registerModule(new JodaModule());
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         Assert.assertNull(payload);
 
@@ -74,7 +75,7 @@ public class NessEventTest
 		NessEvent e = NessEvent.createEvent(USER, ENTRY_TIMESTAMP, EVENT_ID, NessEventTypes.SEARCH, payload);
 
 		String serialized = mapper.writeValueAsString(e);
-		Assert.assertEquals(loadJson("/serializedEvent.json"), mapper.readTree(serialized));
+		Assert.assertEquals(mapper.readValue(loadJson("/serializedEvent.json"), TreeMap.class), mapper.readValue(serialized, TreeMap.class));
 	}
 
 	@Test
@@ -97,8 +98,8 @@ public class NessEventTest
         Assert.assertTrue(StringUtils.contains(serialized, "\"test\":null"));
 	}
 
-	private JsonNode loadJson(String path) throws IOException
+	private String loadJson(String path) throws IOException
 	{
-		return mapper.readTree(this.getClass().getResourceAsStream(path));
+		return IOUtils.toString(this.getClass().getResourceAsStream(path), Charsets.UTF_8);
 	}
 }
