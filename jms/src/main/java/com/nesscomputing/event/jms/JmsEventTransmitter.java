@@ -48,7 +48,7 @@ public class JmsEventTransmitter implements NessEventTransmitter
      private final AtomicReference<TopicProducer<Object>> topicProducerHolder = new AtomicReference<TopicProducer<Object>>();
      private final AtomicReference<Thread> producerThreadHolder = new AtomicReference<Thread>();
 
-     private AtomicInteger eventsTransmitted = new AtomicInteger(0);
+     private final AtomicInteger eventsTransmitted = new AtomicInteger(0);
 
      @Inject
      public JmsEventTransmitter(final JmsEventConfig jmsEventConfig)
