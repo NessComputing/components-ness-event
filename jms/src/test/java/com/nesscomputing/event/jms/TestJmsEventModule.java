@@ -22,6 +22,13 @@ import java.util.UUID;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Binder;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Module;
+import com.google.inject.Stage;
+import com.google.inject.name.Named;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.AfterClass;
@@ -30,23 +37,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Module;
-import com.google.inject.Stage;
-import com.google.inject.name.Named;
 import com.nesscomputing.config.Config;
 import com.nesscomputing.config.ConfigModule;
 import com.nesscomputing.event.NessEvent;
 import com.nesscomputing.event.NessEventModule;
 import com.nesscomputing.event.NessEventSender;
 import com.nesscomputing.event.NessEventType;
-import com.nesscomputing.event.jms.JmsEventConfig;
-import com.nesscomputing.event.jms.JmsEventModule;
-import com.nesscomputing.event.jms.JmsEventReceiver;
-import com.nesscomputing.event.jms.JmsEventTransmitter;
 import com.nesscomputing.jackson.NessJacksonModule;
 import com.nesscomputing.jms.JmsConfig;
 import com.nesscomputing.lifecycle.Lifecycle;
@@ -60,23 +56,23 @@ import com.nesscomputing.testing.lessio.AllowNetworkListen;
 public class TestJmsEventModule
 {
     @Inject
-    private JmsEventConfig eventConfig = null;
+    private final JmsEventConfig eventConfig = null;
 
     @Inject(optional=true)
     @Named(JmsEventModule.JMS_EVENT_NAME)
-    private JmsConfig jmsConfig = null;
+    private final JmsConfig jmsConfig = null;
 
     @Inject(optional=true)
-    private Lifecycle lifecycle = null;
+    private final Lifecycle lifecycle = null;
 
     @Inject(optional=true)
-    private JmsEventReceiver jmsEventReceiver = null;
+    private final JmsEventReceiver jmsEventReceiver = null;
 
     @Inject(optional=true)
-    private JmsEventTransmitter jmsEventTransport = null;
+    private final JmsEventTransmitter jmsEventTransport = null;
 
     @Inject(optional=true)
-    private NessEventSender eventSender = null;
+    private final NessEventSender eventSender = null;
 
     private static Connection CONNECTION = null;
     private static String BROKER_URI = null;
@@ -292,7 +288,7 @@ public class TestJmsEventModule
         Assert.assertFalse(jmsEventTransport.isConnected());
         Assert.assertNotNull(eventSender);
         eventSender.enqueue(NessEvent.createEvent(null, NessEventType.getForName(null)));
-        Thread.sleep(100L);
+        Thread.sleep(1000L);
         Assert.assertTrue(jmsEventTransport.isConnected());
 
         lifecycle.executeTo(LifecycleStage.STOP_STAGE);
@@ -334,7 +330,7 @@ public class TestJmsEventModule
         Assert.assertFalse(jmsEventTransport.isConnected());
         Assert.assertNotNull(eventSender);
         eventSender.enqueue(NessEvent.createEvent(null, NessEventType.getForName(null)));
-        Thread.sleep(100L);
+        Thread.sleep(1000L);
         Assert.assertTrue(jmsEventTransport.isConnected());
 
         Assert.assertEquals(1, jmsEventTransport.getEventsTransmittedCount());
