@@ -125,7 +125,7 @@ public class JmsEventTransmitter implements NessEventTransmitter
              return;
          }
          if (!topicProducer.offerWithTimeout(event)) {
-             LOG.warn("Could not offer message '%s' to topic, maybe stuck?", event);
+             LOG.warn("Could not offer message '%s' to topic, maybe stuck?  Remaining is %s of %s", event, topicProducer.remainingCapacity(), topicProducer.size());
          }
          else {
              eventsTransmitted.incrementAndGet();
