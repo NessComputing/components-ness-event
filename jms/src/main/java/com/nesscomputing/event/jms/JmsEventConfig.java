@@ -16,6 +16,7 @@
 package com.nesscomputing.event.jms;
 
 import org.skife.config.Config;
+import org.skife.config.ConfigReplacements;
 import org.skife.config.Default;
 
 public abstract class JmsEventConfig
@@ -59,5 +60,8 @@ public abstract class JmsEventConfig
     {
         return "ness.events";
     }
+
+    @ConfigReplacements("jmsName")
+    public abstract String getBindingName();
 }
 

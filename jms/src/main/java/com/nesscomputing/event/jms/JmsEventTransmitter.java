@@ -70,7 +70,7 @@ public class JmsEventTransmitter implements NessEventTransmitter
          final TopicProducer<Object> topicProducer = topicProducerHolder.get();
          if (topicProducer != null) {
              Preconditions.checkState(producerThreadHolder.get() == null, "already started, boldly refusing to start twice!");
-             final Thread producerThread = new Thread(topicProducer, "ness-event-jms-producer");
+             final Thread producerThread = new Thread(topicProducer, "ness-event-jms-producer-" + jmsEventConfig.getBindingName() + "-" + jmsEventConfig.getTopicName());
              Preconditions.checkState(producerThreadHolder.getAndSet(producerThread) == null, "thread already set, this should not happen!");
 
              producerThread.setDaemon(true);
