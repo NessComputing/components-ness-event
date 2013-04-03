@@ -31,9 +31,9 @@ import com.google.inject.name.Named;
 
 import com.nesscomputing.event.NessEvent;
 import com.nesscomputing.event.NessEventDispatcher;
+import com.nesscomputing.jms.AbstractConsumer;
 import com.nesscomputing.jms.ConsumerCallback;
 import com.nesscomputing.jms.JmsRunnableFactory;
-import com.nesscomputing.jms.TopicConsumer;
 import com.nesscomputing.lifecycle.LifecycleStage;
 import com.nesscomputing.lifecycle.guice.OnStage;
 import com.nesscomputing.logging.Log;
@@ -50,7 +50,7 @@ public class JmsEventReceiver implements ConsumerCallback<String>
     private final NessEventDispatcher eventDispatcher;
     private final ObjectMapper mapper;
 
-    private final AtomicReference<TopicConsumer> topicConsumerHolder = new AtomicReference<TopicConsumer>();
+    private final AtomicReference<AbstractConsumer> consumerHolder = new AtomicReference<AbstractConsumer>();
     private final AtomicReference<Thread> consumerThreadHolder = new AtomicReference<Thread>();
 
     private final AtomicInteger eventsReceived = new AtomicInteger(0);
@@ -68,16 +68,22 @@ public class JmsEventReceiver implements ConsumerCallback<String>
     @Inject(optional = true)
     public void injectTopicFactory(@Named(JMS_EVENT_NAME) final JmsRunnableFactory topicFactory)
     {
-        this.topicConsumerHolder.set(topicFactory.createTopicTextMessageListener(jmsEventConfig.getTopicName(), this));
+        final AbstractConsumer consumer;
+        if (jmsEventConfig.isUseQueue()) {
+            consumer = topicFactory.createQueueTextMessageListener(jmsEventConfig.getTopicName(), this);
+        } else {
+            consumer = topicFactory.createTopicTextMessageListener(jmsEventConfig.getTopicName() , this);
+        }
+        this.consumerHolder.set(consumer);
     }
 
     @OnStage(LifecycleStage.START)
     public void start()
     {
-        final TopicConsumer topicConsumer = topicConsumerHolder.get();
-        if (topicConsumer != null) {
+        final AbstractConsumer consumer = consumerHolder.get();
+        if (consumer != null) {
             Preconditions.checkState(consumerThreadHolder.get() == null, "already started, boldly refusing to start twice!");
-            final Thread consumerThread = new Thread(topicConsumer, "ness-event-jms-consumer");
+            final Thread consumerThread = new Thread(consumer, "ness-event-jms-consumer");
             Preconditions.checkState(consumerThreadHolder.getAndSet(consumerThread) == null, "thread already set, this should not happen!");
 
             consumerThread.setDaemon(true);
@@ -94,9 +100,9 @@ public class JmsEventReceiver implements ConsumerCallback<String>
         final Thread consumerThread = consumerThreadHolder.getAndSet(null);
         if (consumerThread != null) {
             try {
-                final TopicConsumer topicConsumer = topicConsumerHolder.getAndSet(null);
-                if (topicConsumer != null) {
-                    topicConsumer.shutdown();
+                final AbstractConsumer consumer = consumerHolder.getAndSet(null);
+                if (consumer != null) {
+                    consumer.shutdown();
 
                     consumerThread.interrupt();
                     consumerThread.join(500L);
@@ -113,8 +119,8 @@ public class JmsEventReceiver implements ConsumerCallback<String>
 
     public boolean isConnected()
     {
-        final TopicConsumer topicConsumer = topicConsumerHolder.get();
-        return (topicConsumer != null && topicConsumer.isConnected());
+        final AbstractConsumer consumer = consumerHolder.get();
+        return (consumer != null && consumer.isConnected());
     }
 
     public int getEventsReceivedCount()
