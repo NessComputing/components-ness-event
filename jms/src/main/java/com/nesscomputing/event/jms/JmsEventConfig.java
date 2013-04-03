@@ -61,6 +61,16 @@ public abstract class JmsEventConfig
         return "ness.events";
     }
 
+    /**
+     * If true, use a queue instead of the topic.
+     */
+    @Config("ness.event.${jmsName}.use-queue")
+    @Default("false")
+    public boolean isUseQueue()
+    {
+        return false;
+    }
+
     @ConfigReplacements("jmsName")
     public abstract String getBindingName();
 }
