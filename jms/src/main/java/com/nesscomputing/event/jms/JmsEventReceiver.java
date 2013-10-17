@@ -131,19 +131,29 @@ public class JmsEventReceiver implements ConsumerCallback<String>
     @Override
     public boolean withMessage(final String text) throws JMSException
     {
-        if (text != null) {
-            try {
-                final NessEvent event = mapper.readValue(text, NessEvent.class);
-                eventsReceived.incrementAndGet();
-                eventDispatcher.dispatch(event);
-            }
-            catch (Exception e) {
-                Throwables.propagateIfInstanceOf(e, JMSException.class);
-                // Make sure that we catch all possible exceptions here that could
-                // be thrown by the deserializer. Otherwise, e.g. an IllegalArgumentException will
-                // kill the JMS receiver thread.
-                LOG.warnDebug(e, "Could not parse message '%s', ignoring!", text);
-            }
+        if (text == null) {
+            return true;
+        }
+
+        final NessEvent event;
+        try {
+            event = mapper.readValue(text, NessEvent.class);
+        }
+        catch (Exception e) {
+            // Make sure that we catch all possible exceptions here that could
+            // be thrown by the deserializer. Otherwise, e.g. an IllegalArgumentException will
+            // kill the JMS receiver thread.
+            LOG.warnDebug(e, "Could not parse message '%s', ignoring!", text);
+            return true;
+        }
+
+        try {
+            eventsReceived.incrementAndGet();
+            eventDispatcher.dispatch(event);
+        }
+        catch (Exception e) {
+            Throwables.propagateIfInstanceOf(e, JMSException.class);
+            LOG.error(e, "Exception in event dispatcher.");
         }
 
         return true;

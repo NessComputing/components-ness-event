@@ -56,8 +56,13 @@ class InternalEventDispatcher implements NessEventDispatcher
         else {
 
             for (final NessEventReceiver receiver : eventReceivers) {
-                if (receiver.accept(event)) {
-                    receiver.receive(event);
+                try {
+                    if (receiver.accept(event)) {
+                        receiver.receive(event);
+                    }
+                } catch (Exception e) {
+                    // don't reraise. We prefer to not disrupt event handling by other receievers
+                    LOG.error(e, "Exception during event handling by %s of event %s", receiver, event);
                 }
             }
         }
