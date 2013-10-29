@@ -71,14 +71,13 @@ public class NessEvent
     }
 
     /**
-     * Create a new event over the wire.
+     * Create a new event.
      *
      * @param user      User that the event happened for. Can be null for a system level event.
      * @param timestamp The time when this event entered the system
      * @param type      The Event type.
      * @param payload   Arbitrary data describing the event.
      */
-    @JsonCreator
     public static NessEvent createEvent(@Nullable final UUID user,
                                         @Nullable final DateTime timestamp,
                                         @Nonnull final NessEventType type,
