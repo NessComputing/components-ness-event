@@ -44,15 +44,15 @@ public class NessEvent
     public static final int EVENT_VERSION = 2;
 
     private final Map<String, ? extends Object> payload;
-	private final NessEventType type;
-	private final UUID user;
-	private final UUID id;
+    private final NessEventType type;
+    private final UUID user;
+    private final UUID id;
 
-	/** the time when this event entered the system */
-	private final DateTime timestamp;
+    /** the time when this event entered the system */
+    private final DateTime timestamp;
 
     /**
-     * Create a new event.
+     * Create a new event from over-the-wire json.
      *
      * @param user      User that the event happened for. Can be null for a system level event.
      * @param timestamp The time when this event entered the system
@@ -60,8 +60,8 @@ public class NessEvent
      * @param payload   Arbitrary data describing the event.
      * @param id        UUID as event id.
      */
-	@JsonCreator
-    public static NessEvent createEvent(@Nullable @JsonProperty("user") final UUID user,
+    @JsonCreator
+    static NessEvent createEvent(@Nullable @JsonProperty("user") final UUID user,
                                         @Nullable @JsonProperty("timestamp") final DateTime timestamp,
                                         @Nonnull @JsonProperty("id") final UUID id,
                                         @Nonnull @JsonProperty("type") final NessEventType type,
@@ -70,9 +70,27 @@ public class NessEvent
         return new NessEvent(user, timestamp, type, payload, id);
     }
 
-	/**
-	 * Convenience constructor that assigns the current time in UTC and a random UUID.
-	 */
+    /**
+     * Create a new event over the wire.
+     *
+     * @param user      User that the event happened for. Can be null for a system level event.
+     * @param timestamp The time when this event entered the system
+     * @param type      The Event type.
+     * @param payload   Arbitrary data describing the event.
+     */
+    @JsonCreator
+    public static NessEvent createEvent(@Nullable final UUID user,
+                                        @Nullable final DateTime timestamp,
+                                        @Nonnull final NessEventType type,
+                                        @Nullable final Map<String, ? extends Object> payload)
+    {
+        return new NessEvent(user, timestamp, type, payload, UUID.randomUUID());
+    }
+
+
+    /**
+     * Convenience constructor that assigns the current time in UTC and a random UUID.
+     */
     public static NessEvent createEvent(@Nullable final UUID user,
                                         @Nonnull final NessEventType type,
                                         @Nullable final Map<String, ? extends Object> payload)
@@ -89,60 +107,60 @@ public class NessEvent
         return new NessEvent(user, new DateTime(DateTimeZone.UTC), type, Collections.<String, Object>emptyMap(), UUID.randomUUID());
     }
 
-	/**
-	 * Create a new event.
-	 *
-	 * @param user		 user that the event happend for
-	 * @param timestamp the time when this event entered the system
-	 * @param type	  event type
-	 * @param payload		arbitrary data
-	 * @param id		   system-assigned uuid
-	 */
-	NessEvent(@Nullable final UUID user,
-	          @Nullable final DateTime timestamp,
-	          @Nonnull final NessEventType type,
-	          @Nullable final Map<String, ? extends Object> payload,
-	          @Nonnull final UUID id)
+    /**
+     * Create a new event.
+     *
+     * @param user		 user that the event happend for
+     * @param timestamp the time when this event entered the system
+     * @param type	  event type
+     * @param payload		arbitrary data
+     * @param id		   system-assigned uuid
+     */
+    NessEvent(@Nullable final UUID user,
+              @Nullable final DateTime timestamp,
+              @Nonnull final NessEventType type,
+              @Nullable final Map<String, ? extends Object> payload,
+              @Nonnull final UUID id)
     {
-	    Preconditions.checkArgument(id != null, "id must not be null!");
+        Preconditions.checkArgument(id != null, "id must not be null!");
         Preconditions.checkArgument(type != null, "type must not be null!");
 
-		this.user = user;
-		this.timestamp = (timestamp == null) ? new DateTime(DateTimeZone.UTC) : timestamp;
-		this.type = type;
-		this.id = id;
-		this.payload = (payload == null) ? Collections.<String, Object>emptyMap() : new HashMap<String, Object>(payload);
-	}
+        this.user = user;
+        this.timestamp = (timestamp == null) ? new DateTime(DateTimeZone.UTC) : timestamp;
+        this.type = type;
+        this.id = id;
+        this.payload = (payload == null) ? Collections.<String, Object>emptyMap() : new HashMap<String, Object>(payload);
+    }
 
     @Nonnull
-	public NessEventType getType()
+    public NessEventType getType()
     {
-		return type;
-	}
+        return type;
+    }
 
     @CheckForNull
     public UUID getUser()
     {
-		return user;
-	}
+        return user;
+    }
 
     @Nonnull
-	public DateTime getTimestamp()
+    public DateTime getTimestamp()
     {
-		return timestamp;
-	}
+        return timestamp;
+    }
 
     @Nonnull
-	public Map<String, ? extends Object> getPayload()
+    public Map<String, ? extends Object> getPayload()
     {
-		return payload;
-	}
+        return payload;
+    }
 
     @Nonnull
-	public UUID getId()
+    public UUID getId()
     {
-		return id;
-	}
+        return id;
+    }
 
     @JsonProperty("v")
     public int getVersion()
