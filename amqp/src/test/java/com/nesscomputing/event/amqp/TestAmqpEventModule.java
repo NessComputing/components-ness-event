@@ -228,7 +228,7 @@ public class TestAmqpEventModule
         Assert.assertNotNull(lifecycle);
         lifecycle.executeTo(LifecycleStage.START_STAGE);
 
-        Thread.sleep(500L);
+        Thread.sleep(1500L);
 
         Assert.assertTrue(amqpEventReceiver.isConnected());
 
@@ -306,13 +306,13 @@ public class TestAmqpEventModule
         Assert.assertNotNull(lifecycle);
         lifecycle.executeTo(LifecycleStage.START_STAGE);
 
-        Thread.sleep(200L);
+        Thread.sleep(600L);
 
         Assert.assertTrue(amqpEventReceiver.isConnected());
         Assert.assertFalse(amqpEventTransport.isConnected());
         Assert.assertNotNull(eventSender);
         eventSender.enqueue(NessEvent.createEvent(null, NessEventType.getForName(null)));
-        Thread.sleep(100L);
+        Thread.sleep(500L);
         Assert.assertTrue(amqpEventTransport.isConnected());
 
         Assert.assertEquals(1, amqpEventTransport.getEventsTransmittedCount());
